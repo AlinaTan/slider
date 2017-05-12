@@ -24,4 +24,11 @@ public class Horizontal implements Piece {
 	public void setCell(Cell cell) {
 		this.cell = cell;
 	}
+	
+	public boolean winningMove(int boardSize, int row, int col) {
+		if(col == boardSize) {
+			return true;
+		}
+		return false;
+	}
 }

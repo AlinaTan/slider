@@ -44,6 +44,7 @@ public class Game {
 	    	/** reads input file line by line*/
 	        while (sc.hasNextLine()) {
 	        	inputStr = sc.nextLine();
+	        	System.out.println(inputStr);
 	            boardArray[row] = inputStr.split(" ");
 	            row ++;
 	            

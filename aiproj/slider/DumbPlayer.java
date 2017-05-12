@@ -31,7 +31,10 @@ public class DumbPlayer implements SliderPlayer {
 
 	@Override
 	public void update(Move move) {
-		
+		/**checks if there is a move first */
+		if(move != null) {
+			
+		}
 
 	}
 

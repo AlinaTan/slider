@@ -7,4 +7,5 @@ public interface Piece {
 	public abstract int[][] getPossibleMoves();
 	public abstract String getPieceType();
 	public abstract Cell getCell();
+	public abstract boolean winningMove(int boardSize, int row, int col);
 }

@@ -70,21 +70,27 @@ public class Board {
 		/** move will be in an array form of {rowNumberToAdd, colNumberToAdd} */
 		for(int moveIndex=0; moveIndex<piece.getPossibleMoves().length; moveIndex++) {
 			int[] move = piece.getPossibleMoves()[moveIndex];
+			int newRow = currentRow+move[0], newCol = currentCol+move[1];
+			Integer[] newMove = {(Integer)newRow, (Integer)newCol};
 			
-			/** this try catch block is used to ignore adjacent arrays that would be 
-			 *  out of the boardArray */
-			try {
-				Cell adjacentCell = cells[currentRow+move[0]][currentCol+move[1]];
-				
-				/** adds the Integer typecasted move (named newMove) into validMoves ArrayList
-				 *  only if the adjacent cell with that move isn't blocked or contains any piece */
-				if(!adjacentCell.isBlocked() && !adjacentCell.isHorizontal() && !adjacentCell.isVertical()) {
-					Integer newRow = (Integer)currentRow+move[0], newCol = (Integer)currentCol+move[1];
-					Integer[] newMove = {newRow, newCol};
-					validMoves.add(newMove);
-				}
+			/** first checks if piece would move outside of board and is a winning move*/
+			if(piece.winningMove(cells.length, newRow, newCol) == true) {
+				validMoves.add(newMove);
 			}
-			catch(Exception e) {}
+			else {
+				/** this try catch block is used to ignore adjacent arrays that would be 
+				 *  out of the boardArray */
+				try {
+					Cell adjacentCell = cells[currentRow+move[0]][currentCol+move[1]];
+					
+					/** adds the Integer typecasted move (named newMove) into validMoves ArrayList
+					 *  only if the adjacent cell with that move isn't blocked or contains any piece */
+					if(!adjacentCell.isBlocked() && !adjacentCell.isHorizontal() && !adjacentCell.isVertical()) {
+						validMoves.add(newMove);
+					}
+				}
+				catch(Exception e) {}
+			}
 		}
 		
 		return validMoves;
