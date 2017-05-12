@@ -31,11 +31,30 @@ public class DumbPlayer implements SliderPlayer {
 
 	@Override
 	public void update(Move move) {
-		/**checks if there is a move first */
-		if(move != null) {
+		
+		if(move != null){
+			/* Piece being moved */
+			Piece piece = board.cells[move.j][move.i].getPiece();
 			
+			/* Update movement */
+			switch(move.d){
+			case UP:
+				board.cells[move.j-1][move.i].setPiece(piece);
+				break;
+			case DOWN:
+				board.cells[move.j+1][move.i].setPiece(piece);
+				break;
+			case LEFT:
+				board.cells[move.j][move.i-1].setPiece(piece);
+				break;
+			case RIGHT:
+				board.cells[move.j][move.i+1].setPiece(piece);
+				break;			
+			}
+			
+			/* Set original block to empty */
+			board.cells[move.i][move.j].setPiece(null);
 		}
-
 	}
 
 	@Override
