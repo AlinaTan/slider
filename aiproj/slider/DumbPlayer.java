@@ -59,7 +59,34 @@ public class DumbPlayer implements SliderPlayer {
 
 	@Override
 	public Move move() {
-		return null;
+		java.util.Random rng = new java.util.Random();
+		int i = 0;
+		
+		if(playerPiece == 'H'){
+			int r = rng.nextInt(board.horizontals.size());
+			
+			Piece selectedPiece = board.horizontals.get(0);
+			
+			while (board.validMoves(selectedPiece, board.cells).size() <= 0){
+				selectedPiece = board.horizontals.get(i);
+				i++;
+			}
+			
+			Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(r);
+			
+			Move move = new Move(selectedPiece.getCell().getRow(), selectedPiece.getCell().getCol(), selectedPiece.translateMove(selectedMove));
+			return move;
+		}
+		
+		else {
+			int r = rng.nextInt(board.verticals.size());
+			Piece selectedPiece = board.verticals.get(r);
+			Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(r);
+			
+			Move move = new Move(selectedPiece.getCell().getRow(), selectedPiece.getCell().getCol(), selectedPiece.translateMove(selectedMove));
+			return move;
+		}
+		
 	}
 
 }

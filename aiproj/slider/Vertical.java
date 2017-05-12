@@ -31,4 +31,20 @@ public class Vertical implements Piece {
 		}
 		return false;
 	}
+	
+	public Move.Direction translateMove(Integer[] move){
+		
+		if (move[0] == -1 && move[1] == 0){
+			return Move.Direction.UP;			
+		}
+		else if (move[0] == 0 && move[1] == 1){
+			return Move.Direction.RIGHT;			
+		}
+		else if (move[0] == 1 && move[1] == 0){
+			return Move.Direction.DOWN;			
+		}
+		else {
+			return Move.Direction.LEFT;			
+		}
+	}
 }
