@@ -26,7 +26,7 @@ public class Vertical implements Piece {
 	}
 	
 	public boolean winningMove(int boardSize, int row, int col) {
-		if(row < 0) {
+		if(row == boardSize) {
 			return true;
 		}
 		return false;
@@ -34,13 +34,13 @@ public class Vertical implements Piece {
 	
 	public Move.Direction translateMove(Integer[] move){
 		
-		if (move[0] == -1 && move[1] == 0){
+		if (move[0] == 1 && move[1] == 0){
 			return Move.Direction.UP;			
 		}
 		else if (move[0] == 0 && move[1] == 1){
 			return Move.Direction.RIGHT;			
 		}
-		else if (move[0] == 1 && move[1] == 0){
+		else if (move[0] == -1 && move[1] == 0){
 			return Move.Direction.DOWN;			
 		}
 		else {

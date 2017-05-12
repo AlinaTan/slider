@@ -1,6 +1,10 @@
 package aiproj.slider;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import aiproj.slider.Move.Direction;
 
 public class Board {
 	/** CONSTANTS for what is in each cell of the input file */
@@ -27,18 +31,18 @@ public class Board {
 		for(int row=0; row<boardSize; row++) {
 			for(int col=0; col<boardSize; col++) {
 				cells[row][col] = new Cell(row, col);
-				updateCellState(cells[row][col], boardArray[row][col]);
+				initCellState(cells[row][col], boardArray[row][col]);
 			}
 		}
 	}
 	
 	/** 
-	 * updateCellState updates the cell depending on what is on top of 
+	 * initCellState initialises the cell depending on what is on top of 
 	 * the cell, sets isBlocked to true if the cell is Blocked and
 	 * initializes the Piece object of cell if there is a piece on the cell
-	 * @param cell is the current cell being updated
+	 * @param cell is the current cell being initialised
 	 * @param state is the String of what's on the cell, taken from file input */
-	public void updateCellState(Cell cell, String state) {
+	public void initCellState(Cell cell, String state) {
 		if(state.equals(BLOCKED)) {
 			cell.setIsBlocked(true);
 		}
@@ -54,6 +58,22 @@ public class Board {
 		}
 	}
 	
+	/**
+	 * updateCellState updates the cell with the piece
+	 * @param cell is the current cell being updated
+	 * @param piece is the piece going to be on the cell*/
+	public void updateCellState(Cell cell, Piece piece, Move move) {
+		if(piece == null) {
+			cell.setPiece(null);
+		}
+		else if(piece.getPieceType().equals(HORIZONTAL)) {
+			cell.setPiece(piece);
+		}
+		else if(piece.getPieceType().equals(VERTICAL)) {
+			cell.setPiece(piece);
+		}
+	}
+	
 	/** 
 	 * validMoves returns an ArrayList of valid moves the piece can make,
 	 * with a move being in the form of an int array {rowNumberToAdd, colNumberToAdd}
@@ -66,12 +86,13 @@ public class Board {
 		Cell currentCell = piece.getCell();
 		int currentRow = currentCell.getRow(), currentCol = currentCell.getCol();
 		ArrayList<Integer[]> validMoves = new ArrayList<Integer[]> ();
+
 		
 		/** move will be in an array form of {rowNumberToAdd, colNumberToAdd} */
 		for(int moveIndex=0; moveIndex<piece.getPossibleMoves().length; moveIndex++) {
 			int[] move = piece.getPossibleMoves()[moveIndex];
 			int newRow = currentRow+move[0], newCol = currentCol+move[1];
-			Integer[] newMove = {(Integer)newRow, (Integer)newCol};
+			Integer[] newMove = {(Integer)move[0], (Integer)move[1]};
 			
 			/** first checks if piece would move outside of board and is a winning move*/
 			if(piece.winningMove(cells.length, newRow, newCol) == true) {
@@ -112,6 +133,23 @@ public class Board {
 		}
 		
 		return totalMoves;
+	}
+	
+	public void removePiece(Piece pieceToBeRemoved) {
+		ArrayList<Piece> pieces = null;
+		if(pieceToBeRemoved.getPieceType() == Board.HORIZONTAL_PIECE) {
+			pieces = horizontals;
+		}
+		else if(pieceToBeRemoved.getPieceType() == Board.VERTICAL_PIECE) {
+			pieces = verticals;
+		}
+		
+		for (Iterator<Piece> iterator = pieces.iterator(); iterator.hasNext(); ) {
+		    Piece piece = iterator.next();
+		    if(pieces.indexOf(piece) == pieces.indexOf(pieceToBeRemoved)) {
+				iterator.remove();
+			}
+		}
 	}
 	
 }

@@ -1,7 +1,7 @@
 package aiproj.slider;
 
 public class Horizontal implements Piece {
-	private int[][] possibleMoves = {UP, RIGHT, DOWN};
+	private int[][] possibleMoves = {RIGHT, UP, DOWN};
 	private Cell cell;
 	private String pieceType = Board.HORIZONTAL_PIECE;
 	
@@ -34,13 +34,13 @@ public class Horizontal implements Piece {
 	
 	public Move.Direction translateMove(Integer[] move){
 		
-		if (move[0] == -1 && move[1] == 0){
+		if (move[0] == 1 && move[1] == 0){
 			return Move.Direction.UP;			
 		}
 		else if (move[0] == 0 && move[1] == 1){
 			return Move.Direction.RIGHT;			
 		}
-		else if (move[0] == 1 && move[1] == 0){
+		else if (move[0] == -1 && move[1] == 0){
 			return Move.Direction.DOWN;			
 		}
 		else {
