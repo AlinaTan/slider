@@ -27,18 +27,18 @@ public class Board {
 		for(int row=0; row<boardSize; row++) {
 			for(int col=0; col<boardSize; col++) {
 				cells[row][col] = new Cell(row, col);
-				updateCellState(cells[row][col], boardArray[row][col]);
+				initCellState(cells[row][col], boardArray[row][col]);
 			}
 		}
 	}
 	
 	/** 
-	 * updateCellState updates the cell depending on what is on top of 
+	 * initCellState initialises the cell depending on what is on top of 
 	 * the cell, sets isBlocked to true if the cell is Blocked and
 	 * initializes the Piece object of cell if there is a piece on the cell
-	 * @param cell is the current cell being updated
+	 * @param cell is the current cell being initialised
 	 * @param state is the String of what's on the cell, taken from file input */
-	public void updateCellState(Cell cell, String state) {
+	public void initCellState(Cell cell, String state) {
 		if(state.equals(BLOCKED)) {
 			cell.setIsBlocked(true);
 		}
@@ -51,6 +51,22 @@ public class Board {
 			Vertical vertical = new Vertical(cell);
 			verticals.add(vertical);
 			cell.setPiece(vertical);
+		}
+	}
+	
+	/**
+	 * updateCellState updates the cell with the piece
+	 * @param cell is the current cell being updated
+	 * @param piece is the piece going to be on the cell*/
+	public void updateCellState(Cell cell, Piece piece, Move move) {
+		if(piece == null) {
+			cell.setPiece(null);
+		}
+		else if(piece.getPieceType().equals(HORIZONTAL)) {
+			cell.setPiece(piece);
+		}
+		else if(piece.getPieceType().equals(VERTICAL)) {
+			cell.setPiece(piece);
 		}
 	}
 	
