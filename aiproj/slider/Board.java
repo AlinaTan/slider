@@ -1,4 +1,4 @@
-package slider;
+package aiproj.slider;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package slider;
+package aiproj.slider;
 
 public class Cell {
 	private int row;

@@ -1,4 +1,4 @@
-package slider;
+package aiproj.slider;
 
 public class Horizontal implements Piece {
 	private int[][] possibleMoves = {UP, RIGHT, DOWN};
