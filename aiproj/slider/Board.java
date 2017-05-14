@@ -36,6 +36,17 @@ public class Board {
 		}
 	}
 	
+	/** Copy constructor for board */
+	public Board(Board board) {
+		if(board == null) {
+			System.out.println("Failed to copy board");
+			System.exit(0);
+		}
+		this.cells = board.cells;
+		this.horizontals = board.horizontals;
+		this.verticals = board.verticals;
+	}
+	
 	/** 
 	 * initCellState initialises the cell depending on what is on top of 
 	 * the cell, sets isBlocked to true if the cell is Blocked and
@@ -119,17 +130,21 @@ public class Board {
 	
 	/** 
 	 * totalMoves takes an ArrayList of pieces (either all the horizontal pieces or the vertical pieces)
-	 * and returns the total number of valid moves of the piece type
+	 * and returns a list of the total valid moves of the piece type
 	 * @param pieces an ArrayList of either Horizontal pieces or Vertical pieces
 	 * @param cells is a 2D array of the board
-	 * @return int of the total number of valid moves of the piece type
+	 * @return ArrayList of possible moves for player of piece type (H or V)
 	 */
-	public int totalMoves(ArrayList<Piece> pieces, Cell[][] cells) {
-		int totalMoves = 0;
+	public ArrayList<Move> totalMoves(ArrayList<Piece> pieces, Cell[][] cells) {
+		ArrayList<Move> totalMoves = new ArrayList<Move> ();
 		
 		for(Piece piece : pieces) {
 			ArrayList<Integer[]> validMoves = validMoves(piece, cells);
-			totalMoves += validMoves.size();
+			for(Integer[] move : validMoves) {
+				Cell pieceCell = piece.getCell();
+				Move pieceMove = new Move(pieceCell.getCol(), pieceCell.getRow(), piece.translateMove(move));
+				totalMoves.add(pieceMove);
+			}
 		}
 		
 		return totalMoves;

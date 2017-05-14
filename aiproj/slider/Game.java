@@ -15,8 +15,8 @@ public class Game {
 	public static void main(String args[]) throws NumberFormatException, IOException {
 		String[][] boardArray = fileReader();
 		Board board = new Board(boardArray);
-		System.out.println(board.totalMoves(board.horizontals, board.cells));
-		System.out.println(board.totalMoves(board.verticals, board.cells));
+		System.out.println(board.totalMoves(board.horizontals, board.cells).size());
+		System.out.println(board.totalMoves(board.verticals, board.cells).size());
 	}
 	
 	/**
