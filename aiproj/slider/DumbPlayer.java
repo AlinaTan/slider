@@ -1,6 +1,7 @@
 package aiproj.slider;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Scanner;
 
 public class DumbPlayer implements SliderPlayer {
@@ -86,6 +87,7 @@ public class DumbPlayer implements SliderPlayer {
 		else {
 			pieces = board.verticals;
 		}
+<<<<<<< HEAD
 			
 		/*if(pieces.size() > 0) {
 			Piece selectedPiece = null;
@@ -105,6 +107,10 @@ public class DumbPlayer implements SliderPlayer {
 		}
 			
 		return null;*/
+=======
+		
+		int r = rng.nextInt(board.horizontals.size());
+>>>>>>> origin/master
 		
 		Move bestMove = minimax(board, playerPiece);
 		update(bestMove);
@@ -125,14 +131,25 @@ public class DumbPlayer implements SliderPlayer {
 		int bestScore = 0;
 		Move bestMove = null;
 		
-		for(Move move : validMoves) {
-			int currentScore = evaluateBoard(board, move, player), pieceNumber = 0;
+		// iterate arraylist of validMoves in descending order
+		for (ListIterator iterator = validMoves.listIterator(validMoves.size()); iterator.hasPrevious();) {
+			Move move = (Move)iterator.previous();
+			int currentScore = evaluateBoard(board, move, player);
 			// only updates bestMove if 
 			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
 				bestScore = currentScore;
 				bestMove = move;
 			}
 		}
+		// iterate arraylist of validMoves in descending order
+		/*for(Move move : validMoves) {
+			int currentScore = evaluateBoard(board, move, player);
+			// only updates bestMove if 
+			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
+				bestScore = currentScore;
+				bestMove = move;
+			}
+		}*/
 		
 		if(bestMove == null) {
 			System.out.println("NULL MOVE");
@@ -153,7 +170,6 @@ public class DumbPlayer implements SliderPlayer {
 		int[] translatedMove = pieceToBeMoved.translatePieceMove(move);
 		int score = 0, rowMovedTo = move.j + translatedMove[0],
 				colMovedTo = move.i + translatedMove[1];
-		
 		
 		// gets goal of piece and find the pieces of the player
 		if(playerPiece == 'H') {
@@ -176,7 +192,7 @@ public class DumbPlayer implements SliderPlayer {
 		}
 		
 		// moving to a cell that's one move away from goal +1
-		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 1) {
+		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 0) {
 			score += 1;
 		}
 		
