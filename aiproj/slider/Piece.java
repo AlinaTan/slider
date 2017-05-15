@@ -12,5 +12,9 @@ public interface Piece {
 	public abstract void setCell(Cell cell);
 	public abstract boolean winningMove(int boardSize, int row, int col);
 	
+	// int[] move -> Move.Direction
 	public abstract Direction translateMove(Integer[] move);
+	// Move class -> int[] move
+	public abstract int[] translatePieceMove(Move move);
+	public abstract int distanceToGoal(int boardSize, int move[]);
 }

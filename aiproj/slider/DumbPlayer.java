@@ -37,7 +37,7 @@ public class DumbPlayer implements SliderPlayer {
 			/* Piece being moved */
 			Piece piece = board.cells[move.j][move.i].getPiece();
 			//Piece piece = board.getPiece(board.cells[move.j][move.i]);
-			System.out.println("UPDATE() for player " + playerPiece);
+			//System.out.println("UPDATE() for player " + playerPiece);
 			int rowToMove = 0, colToMove = 0;
 			
 			/* Update movement */
@@ -61,7 +61,7 @@ public class DumbPlayer implements SliderPlayer {
 			if(piece.winningMove(dimension, newRow, newCol) == true) {
 				board.cells[move.j][move.i].setPiece(null);
 				board.removePiece(piece);
-				System.out.println("Piece deleted\n");
+				//System.out.println("Piece deleted\n");
 			}
 			else {
 				/* Set original cell to empty and new cell to have piece */
@@ -69,7 +69,7 @@ public class DumbPlayer implements SliderPlayer {
 				board.cells[newRow][newCol].setPiece(piece);
 				/* Update piece's cell location */
 				piece.setCell(board.cells[move.j + rowToMove][move.i + colToMove]);
-				System.out.println("Piece cell updated into " + piece.getCell().getCol() + ", " + piece.getCell().getRow() + "\n");
+				//System.out.println("Piece cell updated into " + piece.getCell().getCol() + ", " + piece.getCell().getRow() + "\n");
 			}
 		}
 	}
@@ -89,7 +89,7 @@ public class DumbPlayer implements SliderPlayer {
 		
 		int r = rng.nextInt(board.horizontals.size());
 			
-		if(pieces.size() > 0) {
+		/*if(pieces.size() > 0) {
 			Piece selectedPiece = null;
 			for(Piece piece : pieces) {
 				if(board.validMoves(piece, board.cells).size() > 0) {
@@ -106,7 +106,83 @@ public class DumbPlayer implements SliderPlayer {
 			return move;
 		}
 			
-		return null;
+		return null;*/
+		
+		Move bestMove = minimax(board, playerPiece);
+		update(bestMove);
+		
+		return bestMove;
 	}
 
+	public Move minimax(Board board, char player) {
+		ArrayList<Piece> pieces;
+		if(playerPiece == 'H') {
+			pieces = board.horizontals;
+		}
+		else {
+			pieces = board.verticals;
+		}
+		
+		ArrayList<Move> validMoves = board.totalMoves(pieces, board.cells);
+		int bestScore = 0;
+		Move bestMove = null;
+		
+		for(Move move : validMoves) {
+			int currentScore = evaluateBoard(board, move, player), pieceNumber = 0;
+			// only updates bestMove if 
+			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
+				bestScore = currentScore;
+				bestMove = move;
+			}
+		}
+		
+		if(bestMove == null) {
+			System.out.println("NULL MOVE");
+		}
+		else {
+			System.out.println("Best move for piece " + playerPiece + ": " +
+					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
+					", score: " + bestScore);
+		}
+		
+		return bestMove;
+	}
+	
+	public int evaluateBoard(Board board, Move move, char player) {
+		ArrayList<Piece> pieces;
+		Move.Direction goal;
+		Piece pieceToBeMoved = board.cells[move.j][move.i].getPiece();
+		int[] translatedMove = pieceToBeMoved.translatePieceMove(move);
+		int score = 0, rowMovedTo = move.j + translatedMove[0],
+				colMovedTo = move.i + translatedMove[1];
+		
+		
+		// gets goal of piece and find the pieces of the player
+		if(playerPiece == 'H') {
+			pieces = board.horizontals;
+			goal = Move.Direction.RIGHT;
+		}
+		else {
+			pieces = board.verticals;
+			goal = Move.Direction.UP;
+		}
+		
+		// winning move +2
+		if(pieceToBeMoved.winningMove(board.cells.length, rowMovedTo, colMovedTo)) {
+			score += 2;
+		}
+		
+		// moving towards goal +1
+		if(move.d == goal) {
+			score += 1;
+		}
+		
+		// moving to a cell that's one move away from goal +1
+		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 1) {
+			score += 1;
+		}
+		
+		return score;
+	}
+	
 }
