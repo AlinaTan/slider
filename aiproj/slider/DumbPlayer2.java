@@ -77,8 +77,7 @@ public class DumbPlayer2 implements SliderPlayer {
 
 	@Override
 	public Move move() {
-		java.util.Random rng = new java.util.Random();
-		int i = 0;
+		
 		ArrayList<Piece> pieces;
 		
 		if(playerPiece == 'H') {
@@ -87,8 +86,6 @@ public class DumbPlayer2 implements SliderPlayer {
 		else {
 			pieces = board.verticals;
 		}
-		
-		int r = rng.nextInt(board.horizontals.size());
 			
 		if(pieces.size() > 0) {
 			Piece selectedPiece = null;

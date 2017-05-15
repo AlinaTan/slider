@@ -3,8 +3,8 @@ package aiproj.slider;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class DumbPlayer implements SliderPlayer {
-
+public class SmartPlayerAlpha1 implements SliderPlayer {
+	
 	char playerPiece;
 	Board board; 
 	int dimension;
@@ -76,93 +76,75 @@ public class DumbPlayer implements SliderPlayer {
 
 	@Override
 	public Move move() {
-		java.util.Random rng = new java.util.Random();
-		int i = 0;
-		ArrayList<Piece> pieces;
+		
+		ArrayList<Piece> pieces = board.verticals;
 		
 		if(playerPiece == 'H') {
 			pieces = board.horizontals;
 		}
-		else {
-			pieces = board.verticals;
-		}
-			
-		/*if(pieces.size() > 0) {
-			Piece selectedPiece = null;
-			for(Piece piece : pieces) {
-				if(board.validMoves(piece, board.cells).size() > 0) {
-					selectedPiece = piece;
-					break;
-				}
-			}
-			
-			Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(0);
-			System.out.println("Number of valid moves: " + board.validMoves(selectedPiece, board.cells).size());
-			System.out.println(selectedPiece.getCell().getCol() + " ," + selectedPiece.getCell().getRow() + " --> " + selectedPiece.translateMove(selectedMove) + "\n");
-			Move move = new Move(selectedPiece.getCell().getCol(), selectedPiece.getCell().getRow(), selectedPiece.translateMove(selectedMove));
-			update(move);
-			return move;
-		}
-			
-		return null;*/
 		
-		Move bestMove = minimax(board, playerPiece);
-		update(bestMove);
-		
-		return bestMove;
-	}
-
-	public Move minimax(Board board, char player) {
-		ArrayList<Piece> pieces;
-		if(playerPiece == 'H') {
-			pieces = board.horizontals;
-		}
-		else {
-			pieces = board.verticals;
-		}
-		
-		ArrayList<Move> validMoves = board.totalMoves(pieces, board.cells);
-		int bestScore = 0;
-		Move bestMove = null;
-		
-		for(Move move : validMoves) {
-			int currentScore = evaluateBoard(board, move, player), pieceNumber = 0;
-			// only updates bestMove if 
-			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
-				bestScore = currentScore;
-				bestMove = move;
-			}
-		}
-		
-		if(bestMove == null) {
-			System.out.println("NULL MOVE");
-		}
-		else {
-			System.out.println("Best move for piece " + playerPiece + ": " +
-					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
-					", score: " + bestScore);
-		}
-		
-		return bestMove;
+		return null;
 	}
 	
+	public ScoreMove alphabeta(Move move, int depth, int alpha, int beta, char player){
+		
+		
+		/*DOUBLE CHECK (player == 'H') W RIO*/
+		int bestScore = (player == 'H') ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		Move bestMove = move;
+		
+		if (depth == 0 || board.horizontals.isEmpty() || board.verticals.isEmpty()){
+			bestScore = evaluateBoard(board, move, player);
+		}
+		else{
+			
+			if (player == 'H'){
+				/* Need to write a function to find the validmoves 
+				 * of all the pieces of a certain player on the board */
+				for (){
+					/*The 'V' here is basically supposed to be the opposite of what we are */
+					bestScore = Math.max(bestScore, alphabeta(currentMove, depth-1, alpha, beta, 'V').score);
+					/* REMEMBER TO PUT IN THE BESTMOVE */
+					alpha = Math.max(alpha, bestScore);
+					/* DOUBLE CHECK THIS '>' AND '<' THIS */
+					if (beta <= alpha){
+						break;
+					}
+				}
+			}
+			else{
+				/* Need to write a function to find the validmoves 
+				 * of all the pieces of a certain player on the board */
+				for (){
+					bestScore = Math.min(bestScore, alphabeta(move, depth-1, alpha, beta, 'H').score);
+					/* REMEMBER TO PUT IN THE BESTMOVE */
+					beta = Math.min(beta, bestScore);
+					/* DOUBLE CHECK THIS '>' AND '<' THIS */
+					if (beta >= alpha){
+						break;
+					}
+				}
+			}
+
+		}
+		return new ScoreMove(bestMove, bestScore);
+	}
+	
+	
+	
 	public int evaluateBoard(Board board, Move move, char player) {
-		ArrayList<Piece> pieces;
-		Move.Direction goal;
 		Piece pieceToBeMoved = board.cells[move.j][move.i].getPiece();
 		int[] translatedMove = pieceToBeMoved.translatePieceMove(move);
 		int score = 0, rowMovedTo = move.j + translatedMove[0],
 				colMovedTo = move.i + translatedMove[1];
+		ArrayList<Piece> pieces = board.verticals;
+		Move.Direction goal = Move.Direction.RIGHT;
 		
 		
 		// gets goal of piece and find the pieces of the player
 		if(playerPiece == 'H') {
 			pieces = board.horizontals;
 			goal = Move.Direction.RIGHT;
-		}
-		else {
-			pieces = board.verticals;
-			goal = Move.Direction.UP;
 		}
 		
 		// winning move +2
@@ -183,4 +165,14 @@ public class DumbPlayer implements SliderPlayer {
 		return score;
 	}
 	
+	/* Helper Class to store the Move and the Score for Minimax */
+	class ScoreMove{
+		Move move;
+		int score;
+		ScoreMove(Move move, int score){
+			this.move = move;
+			this.score = score;
+		}
+	}
+
 }
