@@ -1,0 +1,5 @@
+For our solution, our agent's init() method uses our modified Board class, storing an internal representation of it, while noting the which player it is. The update() method then updates the cells of the board with the opponent's and our move using our modified Cell, Horizontal and Vertical classes, with the latter two implementing our Piece interface from Part A of the project, to fit the Referee class and SliderPlayer interface. The move() function uses all the above classes which is in the aiproj.slider package.
+
+For our code, we would like to acknowledge the use of Hock Chuan Chua's Java Graphics Tutorial (https://www3.ntu.edu.sg/home/ehchua/programming/java/javagame_tictactoe_ai.html) and the Wikipedia article for Alpha-Beta Pruning's (https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning) code, as reference for our solution.
+
+The approach taken by our agent in determining the best moves to make included the use of the minimax algorithm in addition to alpha-beta pruning to search for the best move by looking at potential moves at a depth of four. We used certain game-specific heuristics that included...
