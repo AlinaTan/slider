@@ -65,4 +65,18 @@ public class Horizontal implements Piece {
 	public int distanceToGoal(int boardSize, int move[]) {
 		return boardSize - (cell.getCol() + move[1]) - 1;
 	}
+	
+	// gets the number of cells the current horizontal piece is away from the closest 
+	// vertical piece in the same col (returns -1 if not blocking any of their paths/no verticals)
+	public int blockingDistance(Board board, int pieceRow, int pieceCol) {
+		int distance = -1;
+		// gets the row of the vertical piece that is in pieceCol and is closest to the goal
+		for(int row = 0; row < board.cells.length; row ++) {
+			if(board.cells[row][pieceCol].isVertical() && row < pieceRow) {
+				distance = pieceRow - row;
+			}
+		}
+		
+		return distance;
+	}
 }

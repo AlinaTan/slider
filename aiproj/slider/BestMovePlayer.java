@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Scanner;
 
-public class DumbPlayer2 implements SliderPlayer {
+public class BestMovePlayer implements SliderPlayer {
 
 	char playerPiece;
 	Board board; 
@@ -89,41 +89,19 @@ public class DumbPlayer2 implements SliderPlayer {
 		}
 		
 		int r = rng.nextInt(board.horizontals.size());
-			
-		if(pieces.size() > 0) {
-			Piece selectedPiece = null;
-			// iterate arraylist of pieces in descending order
-			for (ListIterator iterator = pieces.listIterator(pieces.size()); iterator.hasPrevious();) {
-				Piece piece = (Piece)iterator.previous();
-				if(board.validMoves(piece, board.cells).size() > 0) {
-					selectedPiece = piece;
-					break;
-				}
-			}
-			// iterate arraylist of pieces in ascending order
-			/*for(Piece piece : pieces) {
-				if(board.validMoves(piece, board.cells).size() > 0) {
-					selectedPiece = piece;
-					break;
-				}
-			}*/
-			
-			// checks if no valid moves first
-			if(selectedPiece != null && board.validMoves(selectedPiece, board.cells).size() > 0) {
-				Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(0);
-				Move move = new Move(selectedPiece.getCell().getCol(), selectedPiece.getCell().getRow(), selectedPiece.translateMove(selectedMove));
-				System.out.println("Dumb move for piece " + playerPiece + ": " +
-						"("+ move.j + ", " + move.i + ") --> " + move.d);
-				update(move);
-				return move;
-			}
-		}
-			
-		return null;
+		
+		Move bestMove = minimax(board, playerPiece);
+		update(bestMove);
+		
+		return bestMove;
 	}
 
-	
-	// STUFF BELOW THIS LINE IS FOR MINIMAX AGENT (DumbPlayer.java)
+	/**
+	 * 
+	 * @param board
+	 * @param player
+	 * @return
+	 */
 	public Move minimax(Board board, char player) {
 		ArrayList<Piece> pieces;
 		if(playerPiece == 'H') {
@@ -134,52 +112,94 @@ public class DumbPlayer2 implements SliderPlayer {
 		}
 		
 		ArrayList<Move> validMoves = board.totalMoves(pieces, board.cells);
-		int maxScore = 0;
+		int bestScore = 0;
 		Move bestMove = null;
 		
-		for(Move move : validMoves) {
+		// iterate arraylist of validMoves in descending order
+		for (ListIterator iterator = validMoves.listIterator(validMoves.size()); iterator.hasPrevious();) {
+			Move move = (Move)iterator.previous();
 			int currentScore = evaluateBoard(board, move, player);
-			if(currentScore > maxScore) {
-				maxScore = currentScore;
+			// only updates bestMove if 
+			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
+				bestScore = currentScore;
 				bestMove = move;
 			}
+		}
+		
+		if(bestMove == null) {
+			System.out.println("NULL MOVE");
+		}
+		else {
+			System.out.println("Best move for piece " + playerPiece + ": " +
+					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
+					", score: " + bestScore);
 		}
 		
 		return bestMove;
 	}
 	
+	/**
+	 * 
+	 * @param board
+	 * @param move
+	 * @param player
+	 * @return
+	 */
 	public int evaluateBoard(Board board, Move move, char player) {
 		ArrayList<Piece> pieces;
 		Move.Direction goal;
-		Piece pieceToBeMoved = board.cells[move.j][move.i].getPiece();
+		Piece pieceToBeMoved = board.cells[move.j][move.i].getPiece(), enemyPieceType;
 		int[] translatedMove = pieceToBeMoved.translatePieceMove(move);
-		int score = 0, rowMovedTo = move.j + translatedMove[0],
-				colMovedTo = move.i + translatedMove[1];
+		int score = 0, currentRow = move.j, currentCol = move.i,
+				rowMovedTo = currentRow + translatedMove[0],
+				colMovedTo = currentCol + translatedMove[1];
 		
-		
-		// gets goal of piece and find the pieces of the player
+		// gets goal of piece and find the pieces of the player and enemyPieceType
 		if(playerPiece == 'H') {
 			pieces = board.horizontals;
 			goal = Move.Direction.RIGHT;
+			enemyPieceType = new Vertical(new Cell(0, 0));
 		}
 		else {
 			pieces = board.verticals;
-			goal = Move.Direction.RIGHT;
+			goal = Move.Direction.UP;
+			enemyPieceType = new Horizontal(new Cell(0, 0));
 		}
 		
-		// winning move +2
-		if(pieceToBeMoved.winningMove(board.cells.length, rowMovedTo, colMovedTo)) {
+		// moving towards goal +2
+		if(move.d == goal) {
 			score += 2;
 		}
 		
-		// moving towards goal +1
-		if(move.d == goal) {
-			score += 1;
+		// moving to a cell that's one move away from goal +2
+		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 0) {
+			score += 2;
 		}
 		
-		// moving to a cell that's one move away from goal +1
-		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 1) {
-			score += 1;
+		// winning move +4
+		if(pieceToBeMoved.winningMove(board.cells.length, rowMovedTo, colMovedTo)) {
+			score += 4;
+			// unblocks an opponent's piece that is one step away from winning move -6
+			if(enemyPieceType.winningMove(board.cells.length, currentRow, currentCol)) {
+				score -= 6;
+			}
+		}
+		else {
+			/** only checks for blocking if move is not a winning move (otherwise out of bounds) */
+			// block >=1 of opponent's pieces from their path to goal +1
+			if(pieceToBeMoved.blockingDistance(board, rowMovedTo, colMovedTo) > 0) {
+				score += 1;
+			}
+			
+			// block 1 of opponent's pieces from their path to goal adjacently
+			if(pieceToBeMoved.blockingDistance(board, currentRow, currentCol) < 0 && 
+					pieceToBeMoved.blockingDistance(board, rowMovedTo, colMovedTo) == 1 ) {
+				// also checks if that block is blocking an opponent's piece that is one cell away from winning move +4
+				if(enemyPieceType.winningMove(board.cells.length, rowMovedTo, colMovedTo)) {
+					score += 4;
+					System.out.println("Blocked path of row/col: " + rowMovedTo + ", " + colMovedTo);
+				}
+			}			
 		}
 		
 		return score;

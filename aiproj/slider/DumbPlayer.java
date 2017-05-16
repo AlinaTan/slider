@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class DumbPlayer implements SliderPlayer {
 
-	char playerPiece;
+	char playerPiece, enemyPiece;
 	Board board; 
 	int dimension;
 
@@ -28,6 +28,7 @@ public class DumbPlayer implements SliderPlayer {
 		
 		this.board = new Board(boardArray);
 		this.playerPiece = player;
+		this.enemyPiece = (player == 'H') ? 'H' : 'V';
 		this.dimension = dimension;
 	}
 
@@ -87,116 +88,123 @@ public class DumbPlayer implements SliderPlayer {
 		else {
 			pieces = board.verticals;
 		}
-<<<<<<< HEAD
-			
-		/*if(pieces.size() > 0) {
-			Piece selectedPiece = null;
-			for(Piece piece : pieces) {
-				if(board.validMoves(piece, board.cells).size() > 0) {
-					selectedPiece = piece;
-					break;
-				}
-			}
-			
-			Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(0);
-			System.out.println("Number of valid moves: " + board.validMoves(selectedPiece, board.cells).size());
-			System.out.println(selectedPiece.getCell().getCol() + " ," + selectedPiece.getCell().getRow() + " --> " + selectedPiece.translateMove(selectedMove) + "\n");
-			Move move = new Move(selectedPiece.getCell().getCol(), selectedPiece.getCell().getRow(), selectedPiece.translateMove(selectedMove));
-			update(move);
-			return move;
-		}
-			
-		return null;*/
-=======
 		
 		int r = rng.nextInt(board.horizontals.size());
->>>>>>> origin/master
 		
-		Move bestMove = minimax(board, playerPiece);
+		MoveScore bestMoveScore = minimax(board, 4, playerPiece);
+		Move bestMove = bestMoveScore.move;
+		
+		System.out.println("Best move for piece " + playerPiece + ": " +
+				"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
+				", score: " + bestMoveScore.score);
 		update(bestMove);
 		
 		return bestMove;
 	}
 
-	public Move minimax(Board board, char player) {
+	/**
+	 * 
+	 * @param boardState
+	 * @param depth
+	 * @param player
+	 * @return
+	 */
+	public MoveScore minimax(Board boardState, int depth, char player) {
 		ArrayList<Piece> pieces;
-		if(playerPiece == 'H') {
-			pieces = board.horizontals;
+		if(player == 'H') {
+			pieces = boardState.horizontals;
 		}
 		else {
-			pieces = board.verticals;
+			pieces = boardState.verticals;
 		}
 		
-		ArrayList<Move> validMoves = board.totalMoves(pieces, board.cells);
-		int bestScore = 0;
+		int bestScore = (player == playerPiece) ? Integer.MIN_VALUE : Integer.MAX_VALUE, currentScore;
+		ArrayList<Move> validMoves = boardState.totalMoves(pieces, boardState.cells);
 		Move bestMove = null;
 		
-		// iterate arraylist of validMoves in descending order
-		for (ListIterator iterator = validMoves.listIterator(validMoves.size()); iterator.hasPrevious();) {
-			Move move = (Move)iterator.previous();
-			int currentScore = evaluateBoard(board, move, player);
-			// only updates bestMove if 
-			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
-				bestScore = currentScore;
-				bestMove = move;
+		// checks if no more possible moves or depth has reach 0
+		if (validMoves.isEmpty() || depth == 0) {
+	         bestScore = evaluateBoard();
+	    } 
+		else {
+			// iterate through all nodes/moves
+			for (Move move : validMoves) {
+				if (player == playerPiece) {
+		               currentScore = minimax(boardState, depth - 1, enemyPiece).score;
+		               if (currentScore > bestScore) {
+		                  bestScore = currentScore;
+		                  bestMove = move;
+		               }
+		            } else {
+		               currentScore = minimax(boardState, depth - 1, playerPiece).score;
+		               if (currentScore < bestScore) {
+		                  bestScore = currentScore;
+		                  bestMove = move;
+		               }
+		            }
 			}
 		}
-		// iterate arraylist of validMoves in descending order
-		/*for(Move move : validMoves) {
-			int currentScore = evaluateBoard(board, move, player);
-			// only updates bestMove if 
-			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
-				bestScore = currentScore;
-				bestMove = move;
-			}
-		}*/
 		
-		if(bestMove == null) {
+		/*if(bestMove == null) {
 			System.out.println("NULL MOVE");
 		}
 		else {
 			System.out.println("Best move for piece " + playerPiece + ": " +
 					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
 					", score: " + bestScore);
-		}
+		}*/
 		
-		return bestMove;
+		return new MoveScore(bestMove, bestScore);
 	}
 	
-	public int evaluateBoard(Board board, Move move, char player) {
-		ArrayList<Piece> pieces;
+	/**
+	 * 
+	 * @param board
+	 * @param move
+	 * @param player
+	 * @return
+	 */
+	public int evaluateBoard() {
+		ArrayList<Piece> playerPieces, enemyPieces;
 		Move.Direction goal;
-		Piece pieceToBeMoved = board.cells[move.j][move.i].getPiece();
-		int[] translatedMove = pieceToBeMoved.translatePieceMove(move);
-		int score = 0, rowMovedTo = move.j + translatedMove[0],
-				colMovedTo = move.i + translatedMove[1];
+		Piece enemyPieceType;
+		int score = 0, horIsPlayer = 1, verIsPlayer = 1;
 		
-		// gets goal of piece and find the pieces of the player
+		// gets goal of piece and find the pieces of the player and enemy
 		if(playerPiece == 'H') {
-			pieces = board.horizontals;
+			playerPieces = board.horizontals;
+			enemyPieces = board.verticals;
 			goal = Move.Direction.RIGHT;
+			verIsPlayer = -1;
 		}
 		else {
-			pieces = board.verticals;
+			playerPieces = board.verticals;
+			enemyPieces = board.horizontals;
 			goal = Move.Direction.UP;
+			horIsPlayer = -1;
 		}
 		
-		// winning move +2
-		if(pieceToBeMoved.winningMove(board.cells.length, rowMovedTo, colMovedTo)) {
-			score += 2;
-		}
+		// counts the difference in pieces left on the board
+		score += (enemyPieces.size() - playerPieces.size()) * 10;
 		
-		// moving towards goal +1
-		if(move.d == goal) {
-			score += 1;
+		// utility function
+		if(playerPieces.size() == 0) {
+			score = Integer.MAX_VALUE;
 		}
-		
-		// moving to a cell that's one move away from goal +1
-		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 0) {
-			score += 1;
+		else if(enemyPieces.size() == 0) {
+			score = Integer.MIN_VALUE;
 		}
 		
 		return score;
+	}
+	
+	public class MoveScore {
+		Move move;
+		int score;
+		MoveScore(Move move, int score) {
+			this.move = move;
+			this.score = score;
+		}
 	}
 	
 }

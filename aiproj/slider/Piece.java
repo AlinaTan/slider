@@ -16,5 +16,9 @@ public interface Piece {
 	public abstract Direction translateMove(Integer[] move);
 	// Move class -> int[] move
 	public abstract int[] translatePieceMove(Move move);
+	// how many cells to goal
 	public abstract int distanceToGoal(int boardSize, int move[]);
+	// how many cells is the current piece(row, col) away from the opponent's piece
+	// whose path is blocked by the current piece
+	public abstract int blockingDistance(Board board, int pieceRow, int pieceCol);
 }
