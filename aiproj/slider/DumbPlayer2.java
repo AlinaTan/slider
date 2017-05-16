@@ -178,7 +178,7 @@ public class DumbPlayer2 implements SliderPlayer {
 		}
 		
 		// moving to a cell that's one move away from goal +1
-		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 1) {
+		if(pieceToBeMoved.distanceToGoal(board.cells.length, rowMovedTo, colMovedTo) == 1) {
 			score += 1;
 		}
 		

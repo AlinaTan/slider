@@ -28,7 +28,7 @@ public class DumbPlayer implements SliderPlayer {
 		
 		this.board = new Board(boardArray);
 		this.playerPiece = player;
-		this.enemyPiece = (player == 'H') ? 'H' : 'V';
+		this.enemyPiece = (player == 'H') ? 'V' : 'H';
 		this.dimension = dimension;
 	}
 
@@ -91,12 +91,14 @@ public class DumbPlayer implements SliderPlayer {
 		
 		int r = rng.nextInt(board.horizontals.size());
 		
-		MoveScore bestMoveScore = minimax(board, 4, playerPiece);
+		MoveScore bestMoveScore = minimax(new Board(board), 4, Integer.MIN_VALUE, Integer.MAX_VALUE, playerPiece);
 		Move bestMove = bestMoveScore.move;
 		
-		System.out.println("Best move for piece " + playerPiece + ": " +
-				"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
-				", score: " + bestMoveScore.score);
+		if(bestMove != null) {
+			System.out.println("Best move for piece " + playerPiece + ": " +
+					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
+					", score: " + bestMoveScore.score);
+		}
 		update(bestMove);
 		
 		return bestMove;
@@ -109,7 +111,7 @@ public class DumbPlayer implements SliderPlayer {
 	 * @param player
 	 * @return
 	 */
-	public MoveScore minimax(Board boardState, int depth, char player) {
+	public MoveScore minimax(Board boardState, int depth, int alpha, int beta, char player) {
 		ArrayList<Piece> pieces;
 		if(player == 'H') {
 			pieces = boardState.horizontals;
@@ -130,17 +132,26 @@ public class DumbPlayer implements SliderPlayer {
 			// iterate through all nodes/moves
 			for (Move move : validMoves) {
 				if (player == playerPiece) {
-		               currentScore = minimax(boardState, depth - 1, enemyPiece).score;
+		               currentScore = minimax(boardState, depth - 1, alpha, beta, enemyPiece).score;
 		               if (currentScore > bestScore) {
 		                  bestScore = currentScore;
 		                  bestMove = move;
 		               }
-		            } else {
-		               currentScore = minimax(boardState, depth - 1, playerPiece).score;
+		               alpha = Math.max(alpha, bestScore);
+		               if (beta <= alpha){
+							break;
+						}
+		            } 
+				else {
+		               currentScore = minimax(boardState, depth - 1, alpha, beta, playerPiece).score;
 		               if (currentScore < bestScore) {
 		                  bestScore = currentScore;
 		                  bestMove = move;
 		               }
+		               beta = Math.min(beta, bestScore);
+		               if (beta <= alpha){
+							break;
+						}
 		            }
 			}
 		}
@@ -185,7 +196,27 @@ public class DumbPlayer implements SliderPlayer {
 		}
 		
 		// counts the difference in pieces left on the board
-		score += (enemyPieces.size() - playerPieces.size()) * 10;
+		score += (enemyPieces.size() - playerPieces.size()) * 20;
+		
+		// enemy blocked heuristics
+		for(Piece piece : enemyPieces) {
+			int blockedDistance = piece.pathBlockedDistance(board, piece.getCell().getRow(), piece.getCell().getCol());
+			
+			// enemy piece's path to goal blocked +5
+			if(blockedDistance > 0) {
+				score += 5;
+			}
+			// enemy piece's path to goal adjacently blocked +7
+			if(blockedDistance == 1) {
+				score += 7;
+			}
+			// enemy piece that is one cell away from winning blocked +15
+			if(blockedDistance == 1 && 
+					piece.distanceToGoal(board.cells.length, piece.getCell().getRow(), piece.getCell().getCol()) == 1) {
+				score += 15;
+			}
+			
+		}
 		
 		// utility function
 		if(playerPieces.size() == 0) {

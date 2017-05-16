@@ -172,7 +172,7 @@ public class BestMovePlayer implements SliderPlayer {
 		}
 		
 		// moving to a cell that's one move away from goal +2
-		if(pieceToBeMoved.distanceToGoal(board.cells.length, translatedMove) == 0) {
+		if(pieceToBeMoved.distanceToGoal(board.cells.length, rowMovedTo, colMovedTo) == 0) {
 			score += 2;
 		}
 		
