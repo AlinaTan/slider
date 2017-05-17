@@ -113,7 +113,7 @@ public class DumbPlayer2 implements SliderPlayer {
 				Integer[] selectedMove = board.validMoves(selectedPiece, board.cells).get(0);
 				Move move = new Move(selectedPiece.getCell().getCol(), selectedPiece.getCell().getRow(), selectedPiece.translateMove(selectedMove));
 				System.out.println("Dumb move for piece " + playerPiece + ": " +
-						"("+ move.j + ", " + move.i + ") --> " + move.d);
+						"("+ move.j + ", " + move.i + ") --> " + move.d + "\n");
 				update(move);
 				return move;
 			}

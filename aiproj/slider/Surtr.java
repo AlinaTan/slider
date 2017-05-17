@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Scanner;
 
-public class DumbPlayer implements SliderPlayer {
+public class Surtr implements SliderPlayer {
 
 	char playerPiece, enemyPiece;
 	Board board; 
@@ -205,7 +205,7 @@ public class DumbPlayer implements SliderPlayer {
 		}
 		
 		// counts the difference in pieces left on the board
-		score += (enemyPieces.size() - playerPieces.size()) * 52;
+		score += (enemyPieces.size() - playerPieces.size()) * 30;
 		
 		// enemy blocked heuristics
 		for(Piece piece : enemyPieces) {

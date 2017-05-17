@@ -1,3 +1,9 @@
+/*
+ * Author: Su Ping Alina Tan (743564), Rio Kurnia Susanto (700360)
+ * 
+ * This is an implementation of the board, containing information of the entire board
+ */
+
 package aiproj.slider;
 
 import java.lang.reflect.Array;
@@ -30,21 +36,37 @@ public class Board {
 		
 		for(int row=0; row<boardSize; row++) {
 			for(int col=0; col<boardSize; col++) {
-				cells[row][col] = new Cell(row, col);
-				initCellState(cells[row][col], boardArray[row][col]);
+				int gameRow = boardSize - row - 1, gameCol = col;
+				cells[gameRow][gameCol] = new Cell(gameRow, gameCol);
+				initCellState(cells[gameRow][gameCol], boardArray[row][col]);
+				//System.out.println(gameRow + ", " + gameCol + ": " + boardArray[row][col] + " --gamed--> " + cells[gameRow][gameCol].isHorizontal());
 			}
 		}
 	}
 	
-	/** Copy constructor for board */
+	/**
+	 * Copy constructor for board
+	 * @param board to be copied
+	 */
 	public Board(Board board) {
 		if(board == null) {
 			System.out.println("Failed to copy board");
 			System.exit(0);
 		}
-		this.cells = board.cells;
-		this.horizontals = board.horizontals;
-		this.verticals = board.verticals;
+		this.cells = new Cell[board.cells.length][board.cells.length];
+		for(int row = 0; row < board.cells.length; row ++) {
+			for(int col = 0; col < board.cells.length; col ++) {
+				this.cells[row][col] = new Cell(board.cells[row][col]);
+			}
+		}
+
+		for(Piece h : board.getHorizontals()) {
+			this.horizontals.add(new Horizontal((Horizontal)h));
+		}
+
+		for(Piece v : board.getVerticals()) {
+			this.verticals.add(new Vertical((Vertical)v));
+		}
 	}
 	
 	/** 
@@ -59,11 +81,13 @@ public class Board {
 		}
 		else if(state.equals(HORIZONTAL)) {
 			Horizontal horizontal = new Horizontal(cell);
+			//System.out.println("Horizontal: " + cell.getRow() + ", " + cell.getCol());
 			horizontals.add(horizontal);
 			cell.setPiece(horizontal);
 		}
 		else if(state.equals(VERTICAL)) {
 			Vertical vertical = new Vertical(cell);
+			//System.out.println("Vertical: " + cell.getRow() + ", " + cell.getCol());
 			verticals.add(vertical);
 			cell.setPiece(vertical);
 		}
@@ -150,6 +174,10 @@ public class Board {
 		return totalMoves;
 	}
 	
+	/**
+	 * removes piece from horizontals/verticals
+	 * @param pieceToBeRemoved should be a piece that moves off the board to win
+	 */
 	public void removePiece(Piece pieceToBeRemoved) {
 		ArrayList<Piece> pieces = null;
 		if(pieceToBeRemoved.getPieceType() == Board.HORIZONTAL_PIECE) {
@@ -166,5 +194,66 @@ public class Board {
 			}
 		}
 	}
+	
+	/**
+	 * prints the board
+	 */
+	public void printBoard() {
+		for(int row = cells.length-1; row >= 0; row --) {
+			for(int col = 0; col < cells.length; col ++) {
+				Cell cell = cells[row][col];
+				char content = '+';
+				
+				if(cell.isBlocked()) {
+					content = 'B';
+				}
+				else if(cell.isHorizontal()) {
+					content = 'H';
+				}
+				else if(cell.isVertical()) {
+					content = 'V';
+				}
+					
+				System.out.print(content + " ");
+			}
+			System.out.println("");
+		}
+		System.out.println("");
+	}
+	
+	/**
+	 * gets the piece from horizontals/verticals, giving the row and col it is in the board
+	 * @param row
+	 * @param col
+	 * @return Piece with row and col of input
+	 */
+	public Piece getPiece(int row, int col) {
+		for(Piece h : horizontals) {
+			if(h.getCell().getRow() == row && h.getCell().getCol() == col) {
+				return h;
+			}
+		}
+		for(Piece v : verticals) {
+			if(v.getCell().getRow() == row && v.getCell().getCol() == col) {
+				return v;
+			}
+		}
+		
+		return null;
+	}
+
+	public Cell[][] getCells() {
+		return cells;
+	}
+
+	public ArrayList<Piece> getHorizontals() {
+		return horizontals;
+	}
+
+	public ArrayList<Piece> getVerticals() {
+		return verticals;
+	}
+	
+	
 	
 }

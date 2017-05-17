@@ -16,17 +16,24 @@ public class BestMovePlayer implements SliderPlayer {
 	    String[][] boardArray = new String[dimension][dimension];
 	    /** inputStr is used to temporarily store each line read from the file */
 	    String inputStr;
-	    int row = dimension - 1;
+	    int row = 0;
 		
 		Scanner sc = new Scanner(board).useDelimiter("\n");
 		while(sc.hasNext()) {
 			inputStr = sc.next();
 			boardArray[row] = inputStr.split(" ");
-            row --;
+            row ++;
 		}
 		sc.close();
 		
 		this.board = new Board(boardArray);
+		//this.board2 = new Board(this.board);
+		//this.board2.cells[0][1].setPiece(null);
+		//this.board2.verticals.add(new Vertical(new Cell(0, 0)));
+		
+		//this.board.printBoard();
+		//this.board2.printBoard();
+		
 		this.playerPiece = player;
 		this.dimension = dimension;
 	}
@@ -120,20 +127,20 @@ public class BestMovePlayer implements SliderPlayer {
 			Move move = (Move)iterator.previous();
 			int currentScore = evaluateBoard(board, move, player);
 			// only updates bestMove if 
-			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0)) {
+			if(currentScore > bestScore || (bestScore == 0 && currentScore == 0) || bestMove == null) {
 				bestScore = currentScore;
 				bestMove = move;
 			}
 		}
 		
-		if(bestMove == null) {
+		/*if(bestMove == null) {
 			System.out.println("NULL MOVE");
 		}
 		else {
 			System.out.println("Best move for piece " + playerPiece + ": " +
 					"("+ bestMove.j + ", " + bestMove.i + ") --> " + bestMove.d +
 					", score: " + bestScore);
-		}
+		}*/
 		
 		return bestMove;
 	}

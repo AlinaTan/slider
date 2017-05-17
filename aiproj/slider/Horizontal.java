@@ -1,3 +1,10 @@
+/*
+ * Author: Su Ping Alina Tan (743564), Rio Kurnia Susanto (700360)
+ * 
+ * This class represents the horizontal piece, implementing the Piece class
+ * It contains information and methods specific to a horizontal player
+ */
+
 package aiproj.slider;
 
 public class Horizontal implements Piece {
@@ -5,8 +12,20 @@ public class Horizontal implements Piece {
 	private Cell cell;
 	private String pieceType = Board.HORIZONTAL_PIECE;
 	
+	/**
+	 * Constructor for Horizontal class
+	 * @param cell the Horizontal piece is on
+	 */
 	public Horizontal(Cell cell) {
 		this.cell = cell;
+	}
+	
+	/**
+	 * Copy constructor for Horizontal class
+	 * @param horizontal piece to be copied
+	 */
+	public Horizontal(Horizontal horizontal) {
+		this.cell = new Cell(horizontal.getCell());
 	}
 	
 	public int[][] getPossibleMoves() {
@@ -66,23 +85,9 @@ public class Horizontal implements Piece {
 		return boardSize - pieceCol - 1;
 	}
 	
-	// gets the number of cells the current horizontal piece is away from the closest 
-	// vertical piece in the same col (returns -1 if not blocking any of their paths/no verticals)
-	public int blockingDistance(Board board, int pieceRow, int pieceCol) {
-		int distance = -1;
-		// gets the row of the vertical piece that is in pieceCol and is closest to the goal
-		for(int row = 0; row < board.cells.length; row ++) {
-			if(board.cells[row][pieceCol].isVertical() && row < pieceRow) {
-				distance = pieceRow - row;
-			}
-		}
-		
-		return distance;
-	}
-	
 	public int pathBlockedDistance(Board board, int pieceRow, int pieceCol) {
 		for(int col = pieceCol; col < board.cells.length; col ++) {
-			if(board.cells[pieceRow][col].isVertical()) {
+			if(board.cells[pieceRow][col].isVertical()  || board.cells[pieceRow][col].isBlocked()) {
 				return (col - pieceCol);
 			}
 		}

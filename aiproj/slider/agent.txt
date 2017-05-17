@@ -1,1 +1,1 @@
-aiproj.slider.Sutrtr
+aiproj.slider.DumbPlayer
